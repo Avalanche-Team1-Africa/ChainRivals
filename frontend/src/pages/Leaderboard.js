@@ -282,10 +282,10 @@ function Leaderboard() {
                           user.chain === "avalanche" 
                             ? "https://upload.wikimedia.org/wikipedia/en/0/03/Avalanche_logo_without_text.png"
                             : user.chain === "celo"
-                              ? "https://cryptologos.cc/logos/celo-celo-logo.png"
+                              ? "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTyejSxfv1VRb4-lAhpR2xyG-_-A1XH0n9riw&s"
                               : user.chain === "polygon"
-                                ? "https://cryptologos.cc/logos/polygon-matic-logo.png"
-                                : "https://cryptologos.cc/logos/lisk-lsk-logo.png"
+                                ? "https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/Polygon_Icon.svg/800px-Polygon_Icon.svg.png"
+                                : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTnzyhzN1YSR8HlnU962hUG0BJv4FaSm9NljA&s"
                         } 
                         alt={user.chain} 
                         className="w-4 h-4 mr-1"

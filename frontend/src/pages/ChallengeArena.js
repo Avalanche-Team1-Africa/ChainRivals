@@ -114,7 +114,7 @@ function ChallengeArena({ challenges }) {
                       src={
                         challenge.chain === "avalanche" 
                           ? "https://upload.wikimedia.org/wikipedia/en/0/03/Avalanche_logo_without_text.png"
-                          : "https://cryptologos.cc/logos/celo-celo-logo.png"
+                          : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTyejSxfv1VRb4-lAhpR2xyG-_-A1XH0n9riw&s"
                       } 
                       alt={challenge.chain} 
                       className="w-4 h-4 mr-1"

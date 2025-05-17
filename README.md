@@ -32,7 +32,7 @@ Ensure you have the following installed:
 Clone the repository:
 ```sh
  git clone https://github.com/Avalanche-Team1-Africa/ChainRivals.git
- cd smart-contract-wars
+ cd ChainRivals
 ```
 
 Install dependencies:

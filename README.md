@@ -31,7 +31,7 @@ Ensure you have the following installed:
 ### Setup
 Clone the repository:
 ```sh
- git clone https://github.com/YOUR_GITHUB_USERNAME/chain-rivals-v2.git
+ git clone https://github.com/Avalanche-Team1-Africa/ChainRivals.git
  cd smart-contract-wars
 ```
 

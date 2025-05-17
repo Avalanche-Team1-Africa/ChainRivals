@@ -310,7 +310,7 @@ function Homepage({ challenges }) {
                       <img 
                         src={
                           challenge.chain === "avalanche" 
-                            ? "https://cryptologos.cc/logos/avalanche-avax-logo.png"
+                            ? "https://upload.wikimedia.org/wikipedia/en/0/03/Avalanche_logo_without_text.png"
                             : "https://cryptologos.cc/logos/celo-celo-logo.png"
                         } 
                         alt={challenge.chain} 
@@ -515,7 +515,7 @@ function ChallengeArena({ challenges }) {
                     <img 
                       src={
                         challenge.chain === "avalanche" 
-                          ? "https://cryptologos.cc/logos/avalanche-avax-logo.png"
+                          ? "https://cryptologos.cc/logos/avalanche-avax-logo.svg"
                           : "https://cryptologos.cc/logos/celo-celo-logo.png"
                       } 
                       alt={challenge.chain} 
@@ -807,7 +807,7 @@ function ChallengeDetail() {
                 <img 
                   src={
                     challenge?.chain === "avalanche" 
-                      ? "https://cryptologos.cc/logos/avalanche-avax-logo.png"
+                      ? "https://upload.wikimedia.org/wikipedia/en/0/03/Avalanche_logo_without_text.png"
                       : "https://cryptologos.cc/logos/celo-celo-logo.png"
                   } 
                   alt={challenge?.chain} 
@@ -1217,7 +1217,7 @@ function Leaderboard() {
                       <img 
                         src={
                           user.chain === "avalanche" 
-                            ? "https://cryptologos.cc/logos/avalanche-avax-logo.png"
+                            ? "https://upload.wikimedia.org/wikipedia/en/0/03/Avalanche_logo_without_text.png"
                             : user.chain === "celo"
                               ? "https://cryptologos.cc/logos/celo-celo-logo.png"
                               : user.chain === "polygon"

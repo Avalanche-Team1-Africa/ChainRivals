@@ -87,6 +87,13 @@ git clone https://github.com/Avalanche-Team1-Africa/ChainRivals.git
 cd ChainRivals
 ```
 
+or 
+
+```sh
+git clone https://github.com/kevinIsomMoringa/ChainRIvals_v2.git
+cd ChainRivals
+```
+
  1. Install dependencies:
 
 ```sh

@@ -87,7 +87,7 @@ git clone https://github.com/Avalanche-Team1-Africa/ChainRivals.git
 cd ChainRivals
 ```
 
-or 
+or
 
 ```sh
 git clone https://github.com/kevinIsomMoringa/ChainRIvals_v2.git

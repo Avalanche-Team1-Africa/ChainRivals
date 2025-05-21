@@ -11,7 +11,7 @@ function Homepage({ challenges }) {
       <section className="text-center py-20 bg-gradient-to-r from-purple-900 to-blue-900 rounded-xl">
         <div className="max-w-4xl mx-auto px-4">
           <h1 className="text-5xl font-extrabold mb-6">
-            The Smart Contract Battleground
+            The Ultimate Smart Contract Battleground
           </h1>
           <p className="text-xl text-gray-300 mb-8">
             Compete in gas optimization and security challenges, earn rewards, and build your Web3 reputation across multiple chains.

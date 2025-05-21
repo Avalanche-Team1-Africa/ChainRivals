@@ -5,7 +5,7 @@ function Footer() {
         <div className="flex flex-col md:flex-row justify-between items-center">
           <div className="mb-4 md:mb-0">
             <p className="text-gray-400 text-sm">
-              &copy; {new Date().getFullYear()} ChainRivals - The Smart Contract Battleground
+              &copy; {new Date().getFullYear()} ChainRivals - The Ultimate Smart Contract Battleground
             </p>
           </div>
           

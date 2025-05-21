@@ -182,7 +182,7 @@ function Footer() {
         <div className="flex flex-col md:flex-row justify-between items-center">
           <div className="mb-4 md:mb-0">
             <p className="text-gray-400 text-sm">
-              &copy; {new Date().getFullYear()} ChainRivals - The Smart Contract Battleground
+              &copy; {new Date().getFullYear()} ChainRivals - The Ultimate Smart Contract Battleground
             </p>
           </div>
           
@@ -243,9 +243,12 @@ function Homepage({ challenges }) {
       {/* Hero Section */}
       <section className="text-center py-20 bg-gradient-to-r from-purple-900 to-blue-900 rounded-xl">
         <div className="max-w-4xl mx-auto px-4">
-          <h1 className="text-5xl font-extrabold mb-6">
-            The Smart Contract Battleground
+          <h1 className="text-6xl font-extrabold mb-4 bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+            ChainRivals
           </h1>
+          <h2 className="text-3xl font-semibold mb-8 text-gray-300">
+            The Ultimate Smart Contract Battleground
+          </h2>
           <p className="text-xl text-gray-300 mb-8">
             Compete in gas optimization and security challenges, earn rewards, and build your Web3 reputation across multiple chains.
           </p>

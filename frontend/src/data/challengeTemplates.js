@@ -112,6 +112,69 @@ contract EventLoggingChallenge {
 }
 `;
 
+// Chain-specific templates
+export const celoTemplate = `// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract CeloChallenge {
+    // This contract needs to be optimized for Celo's unique features
+    // Your task is to implement Celo-specific optimizations
+    
+    mapping(address => uint256) public balances;
+    address public stableToken;
+    
+    function initialize(address _stableToken) public {
+        stableToken = _stableToken;
+    }
+    
+    function deposit(uint256 amount) public {
+        // Implement Celo stable token integration
+        balances[msg.sender] += amount;
+    }
+    
+    function withdraw(uint256 amount) public {
+        require(balances[msg.sender] >= amount, "Insufficient balance");
+        balances[msg.sender] -= amount;
+    }
+    
+    function getBalance() public view returns (uint256) {
+        return balances[msg.sender];
+    }
+}
+`;
+
+export const liskTemplate = `// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract LiskChallenge {
+    // This contract needs to be optimized for Lisk's unique features
+    // Your task is to implement Lisk-specific optimizations
+    
+    mapping(address => uint256) public balances;
+    mapping(address => bool) public isValidator;
+    
+    function initialize(address[] memory validators) public {
+        for (uint256 i = 0; i < validators.length; i++) {
+            isValidator[validators[i]] = true;
+        }
+    }
+    
+    function stake(uint256 amount) public {
+        require(amount > 0, "Amount must be greater than 0");
+        balances[msg.sender] += amount;
+    }
+    
+    function unstake(uint256 amount) public {
+        require(balances[msg.sender] >= amount, "Insufficient balance");
+        balances[msg.sender] -= amount;
+    }
+    
+    function getStake(address account) public view returns (uint256) {
+        return balances[account];
+    }
+}
+`;
+
 // Challenge Types and Metadata
 const challengeTypes = {
   gas_optimization: {
@@ -145,6 +208,22 @@ const challengeTypes = {
     difficulty: "beginner",
     reward: 75,
     initial_code: eventLoggingTemplate
+  },
+  celo_specific: {
+    template: celoTemplate,
+    title: "Celo Stable Token Integration",
+    description: "Implement and optimize a contract for Celo's stable token system.",
+    difficulty: "intermediate",
+    reward: 200,
+    initial_code: celoTemplate
+  },
+  lisk_specific: {
+    template: liskTemplate,
+    title: "Lisk Validator Integration",
+    description: "Implement and optimize a contract for Lisk's validator system.",
+    difficulty: "advanced",
+    reward: 300,
+    initial_code: liskTemplate
   }
 };
 
@@ -159,6 +238,26 @@ const getRandomElement = (array) => {
 
 // Mock Challenge Data
 export const getMockChallenge = (id) => {
+  // Chain-specific challenges
+  if (id === "7" || id === "8") {
+    return {
+      ...challengeTypes.celo_specific,
+      id,
+      challenge_type: "celo_specific",
+      chain: "celo",
+      ends_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+    };
+  }
+  if (id === "9" || id === "10") {
+    return {
+      ...challengeTypes.lisk_specific,
+      id,
+      challenge_type: "lisk_specific",
+      chain: "lisk",
+      ends_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+    };
+  }
+
   // If id is "1" or "2", use those specific challenges for demo purposes
   if (id === "1") {
     return {
@@ -187,7 +286,7 @@ export const getMockChallenge = (id) => {
     ...challengeTypes[selectedType],
     id,
     challenge_type: selectedType,
-    chain: getRandomElement(["avalanche", "ethereum", "polygon"]),
+    chain: getRandomElement(["avalanche", "ethereum", "polygon", "celo", "lisk"]),
     ends_at: new Date(Date.now() + (Math.floor(Math.random() * 48) + 24) * 60 * 60 * 1000).toISOString() // 24-72 hours
   };
 };
@@ -198,7 +297,9 @@ export const getMockEvaluation = (challengeType) => {
     gas_optimization: { gas: 0.78, security: 0.65 },
     security_exploit: { gas: 0.45, security: 0.85 },
     access_control: { gas: 0.60, security: 0.90 },
-    event_logging: { gas: 0.70, security: 0.75 }
+    event_logging: { gas: 0.70, security: 0.75 },
+    celo_specific: { gas: 0.65, security: 0.80 },
+    lisk_specific: { gas: 0.55, security: 0.85 }
   };
 
   const feedbacks = {
@@ -221,6 +322,16 @@ export const getMockEvaluation = (challengeType) => {
       "Great job adding events for all state changes. Consider adding indexed parameters.",
       "Good implementation of event logging. You could add more detailed event parameters.",
       "Well done with the event structure. Consider adding events for failed operations too."
+    ],
+    celo_specific: [
+      "Good integration with Celo's stable token system. Consider optimizing for Celo's unique features.",
+      "Well done implementing the stable token interface. Consider adding more Celo-specific optimizations.",
+      "Nice work on the Celo integration. Consider adding support for multiple stable tokens."
+    ],
+    lisk_specific: [
+      "Excellent implementation of the validator system. Consider adding more Lisk-specific features.",
+      "Good work on the staking mechanism. Consider optimizing for Lisk's consensus model.",
+      "Well done with the validator integration. Consider adding more security measures."
     ]
   };
 
@@ -252,6 +363,20 @@ export const getMockEvaluation = (challengeType) => {
       "Add events for failed operations",
       "Consider using event libraries",
       "Add timestamps to events"
+    ],
+    celo_specific: [
+      "Optimize for Celo's stable token system",
+      "Add support for multiple stable tokens",
+      "Implement Celo-specific gas optimizations",
+      "Add events for stable token operations",
+      "Consider using Celo's unique features"
+    ],
+    lisk_specific: [
+      "Optimize for Lisk's validator system",
+      "Add more validator management functions",
+      "Implement Lisk-specific security measures",
+      "Add events for validator operations",
+      "Consider using Lisk's consensus features"
     ]
   };
 

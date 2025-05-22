@@ -30,7 +30,7 @@ const AIHelper = () => {
 
       // Add welcome card
       addWidget(createCardWidget(
-        'Welcome to ChainRivals, I am your ChainRivals Companion',
+        'Welcome to ChainRivals',
         'I can help you with code analysis, suggestions, and more. What would you like to do?'
       ));
 

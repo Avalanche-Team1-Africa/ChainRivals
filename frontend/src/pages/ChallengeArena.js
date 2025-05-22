@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
-function ChallengeArena({ challenges }) {
+function ChallengeArena({ challenges = [] }) {
   const [filters, setFilters] = useState({
     type: "all",
     difficulty: "all",
@@ -23,6 +23,40 @@ function ChallengeArena({ challenges }) {
       ...filters,
       [filterType]: value
     });
+  };
+
+  // Helper function to get token symbol
+  const getTokenSymbol = (chain) => {
+    switch (chain) {
+      case "ethereum":
+        return "ETH";
+      case "polygon":
+        return "MATIC";
+      case "celo":
+        return "CELO";
+      case "lisk":
+        return "LSK";
+      default:
+        return "AVAX";
+    }
+  };
+
+  // Helper function to get chain logo
+  const getChainLogo = (chain) => {
+    switch (chain) {
+      case "avalanche":
+        return "https://upload.wikimedia.org/wikipedia/en/0/03/Avalanche_logo_without_text.png";
+      case "ethereum":
+        return "https://upload.wikimedia.org/wikipedia/commons/0/05/Ethereum_logo_2014.svg";
+      case "polygon":
+        return "https://polygon.technology/_nuxt/img/polygon-logo.8a3c4c9.svg";
+      case "celo":
+        return "https://cryptologos.cc/logos/celo-celo-logo.svg";
+      case "lisk":
+        return "https://cryptologos.cc/logos/lisk-lsk-logo.svg";
+      default:
+        return "https://upload.wikimedia.org/wikipedia/en/0/03/Avalanche_logo_without_text.png";
+    }
   };
 
   return (
@@ -47,6 +81,8 @@ function ChallengeArena({ challenges }) {
               <option value="all">All Types</option>
               <option value="gas_optimization">Gas Optimization</option>
               <option value="security_exploit">Security Exploit</option>
+              <option value="access_control">Access Control</option>
+              <option value="event_logging">Event Logging</option>
             </select>
           </div>
           
@@ -73,8 +109,9 @@ function ChallengeArena({ challenges }) {
             >
               <option value="all">All Chains</option>
               <option value="avalanche">Avalanche</option>
-              <option value="celo">Celo</option>
+              <option value="ethereum">Ethereum</option>
               <option value="polygon">Polygon</option>
+              <option value="celo">Celo</option>
               <option value="lisk">Lisk</option>
             </select>
           </div>
@@ -91,9 +128,19 @@ function ChallengeArena({ challenges }) {
                   <span className={
                     challenge.challenge_type === "gas_optimization" 
                       ? "bg-green-900 text-green-300 px-3 py-1 rounded-full text-xs"
-                      : "bg-red-900 text-red-300 px-3 py-1 rounded-full text-xs"
+                      : challenge.challenge_type === "security_exploit"
+                        ? "bg-red-900 text-red-300 px-3 py-1 rounded-full text-xs"
+                        : challenge.challenge_type === "access_control"
+                          ? "bg-blue-900 text-blue-300 px-3 py-1 rounded-full text-xs"
+                          : "bg-purple-900 text-purple-300 px-3 py-1 rounded-full text-xs"
                   }>
-                    {challenge.challenge_type === "gas_optimization" ? "Gas Optimization" : "Security Exploit"}
+                    {challenge.challenge_type === "gas_optimization" 
+                      ? "Gas Optimization" 
+                      : challenge.challenge_type === "security_exploit"
+                        ? "Security Exploit"
+                        : challenge.challenge_type === "access_control"
+                          ? "Access Control"
+                          : "Event Logging"}
                   </span>
                   <span className="bg-gray-700 text-gray-300 px-3 py-1 rounded-full text-xs">
                     {challenge.difficulty}
@@ -107,15 +154,13 @@ function ChallengeArena({ challenges }) {
                       <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z"></path>
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clipRule="evenodd"></path>
                     </svg>
-                    <span className="text-yellow-500 font-medium">{challenge.reward} AVAX</span>
+                    <span className="text-yellow-500 font-medium">
+                      {challenge.reward} {getTokenSymbol(challenge.chain)}
+                    </span>
                   </div>
                   <div className="flex items-center text-xs text-gray-400">
                     <img 
-                      src={
-                        challenge.chain === "avalanche" 
-                          ? "https://upload.wikimedia.org/wikipedia/en/0/03/Avalanche_logo_without_text.png"
-                          : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTyejSxfv1VRb4-lAhpR2xyG-_-A1XH0n9riw&s"
-                      } 
+                      src={getChainLogo(challenge.chain)}
                       alt={challenge.chain} 
                       className="w-4 h-4 mr-1"
                     />

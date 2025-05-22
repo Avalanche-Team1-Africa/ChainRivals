@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ethers } from "ethers";
 import axios from "axios";
 import "./App.css";
+import { getMockChallenge } from './data/challengeTemplates';
 
 // Components
 import Header from "./components/Header";
@@ -21,7 +22,7 @@ import { MetaMaskContextProvider } from "./contexts/MetaMaskContext";
 import Editor from "@monaco-editor/react";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
+const API = BACKEND_URL ? `${BACKEND_URL}/api` : '';
 
 // App Component
 function App() {
@@ -30,10 +31,70 @@ function App() {
   useEffect(() => {
     const fetchChallenges = async () => {
       try {
+        // Try to fetch from API first
         const response = await axios.get(`${API}/challenges`);
         setDisplayChallenges(response.data);
       } catch (error) {
-        console.error("Error fetching challenges:", error);
+        console.log("Using mock challenges due to API error:", error);
+        // If API fails, use mock challenges
+        const mockChallenges = [
+          // Avalanche Challenges
+          {
+            ...getMockChallenge("1"),
+            chain: "avalanche",
+            reward: 100
+          },
+          {
+            ...getMockChallenge("2"),
+            chain: "avalanche",
+            reward: 150
+          },
+          // Ethereum Challenges
+          {
+            ...getMockChallenge("3"),
+            chain: "ethereum",
+            reward: 0.5
+          },
+          {
+            ...getMockChallenge("4"),
+            chain: "ethereum",
+            reward: 0.75
+          },
+          // Polygon Challenges
+          {
+            ...getMockChallenge("5"),
+            chain: "polygon",
+            reward: 50
+          },
+          {
+            ...getMockChallenge("6"),
+            chain: "polygon",
+            reward: 75
+          },
+          // Celo Challenges
+          {
+            ...getMockChallenge("7"),
+            chain: "celo",
+            reward: 200
+          },
+          {
+            ...getMockChallenge("8"),
+            chain: "celo",
+            reward: 250
+          },
+          // Lisk Challenges
+          {
+            ...getMockChallenge("9"),
+            chain: "lisk",
+            reward: 300
+          },
+          {
+            ...getMockChallenge("10"),
+            chain: "lisk",
+            reward: 350
+          }
+        ];
+        setDisplayChallenges(mockChallenges);
       }
     };
 

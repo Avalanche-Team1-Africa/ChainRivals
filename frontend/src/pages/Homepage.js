@@ -10,8 +10,8 @@ function Homepage({ challenges }) {
       {/* Hero Section */}
       <section className="text-center py-20 bg-gradient-to-r from-purple-900 to-blue-900 rounded-xl">
         <div className="max-w-4xl mx-auto px-4">
-          <h1 className="text-6xl font-extrabold mb-4 bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
-            ChainRivals
+        <h1 className="text-6xl font-extrabold mb-4 bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+            ChainRivals<span className="text-sm align-sub ml-1 text-purple-300">beta</span>
           </h1>
           <h2 className="text-4xl font-extrabold mb-8 text-gray-300">
             The Ultimate Smart Contract Battleground

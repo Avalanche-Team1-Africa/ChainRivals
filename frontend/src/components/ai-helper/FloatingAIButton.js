@@ -12,7 +12,7 @@ const FloatingAIButton = () => {
       animate={{ scale: 1, opacity: 1 }}
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
-      aria-label={isOpen ? "Close AI Helper" : "Open AI Helper"}
+      aria-label={isOpen ? "Close AI Companion" : "Open AI Companion"}
       role="button"
       tabIndex={0}
     >

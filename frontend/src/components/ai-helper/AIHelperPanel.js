@@ -57,8 +57,8 @@ const AIHelperPanel = () => {
                     <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-gray-900"></div>
                   </div>
                   <div>
-                    <h2 className="text-white font-semibold">AI Helper</h2>
-                    <p className="text-purple-200 text-sm">Your coding companion</p>
+                    <h2 className="text-white font-semibold">AI Companion</h2>
+                    <p className="text-purple-200 text-sm">Your ChainRivals coding companion</p>
                   </div>
                 </div>
                 <button

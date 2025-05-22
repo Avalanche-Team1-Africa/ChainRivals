@@ -3,70 +3,11 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Editor from "@monaco-editor/react";
 import { MetaMaskContext } from "../contexts/MetaMaskContext";
+import { getMockChallenge, getMockEvaluation } from "../data/challengeTemplates";
+import AICompanion from "../components/AICompanion";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
-
-// Sample initial contract code for gas optimization challenge
-const gasOptimizationTemplate = `// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
-
-contract GasOptimizationChallenge {
-    // This is a simple token transfer function
-    // Your task is to optimize it for gas efficiency
-    
-    mapping(address => uint256) public balances;
-    
-    function initialize(address[] memory addresses, uint256[] memory amounts) public {
-        require(addresses.length == amounts.length, "Arrays must be same length");
-        
-        for (uint256 i = 0; i < addresses.length; i++) {
-            balances[addresses[i]] = amounts[i];
-        }
-    }
-    
-    function transfer(address to, uint256 amount) public returns (bool) {
-        require(balances[msg.sender] >= amount, "Insufficient balance");
-        
-        balances[msg.sender] = balances[msg.sender] - amount;
-        balances[to] = balances[to] + amount;
-        
-        return true;
-    }
-    
-    function getBalance(address account) public view returns (uint256) {
-        return balances[account];
-    }
-}
-`;
-
-// Sample initial contract code for security challenge
-const securityExploitTemplate = `// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
-
-contract VulnerableContract {
-    // This contract has security vulnerabilities
-    // Your task is to identify and fix them
-    
-    mapping(address => uint256) public balances;
-    
-    function deposit() public payable {
-        balances[msg.sender] += msg.value;
-    }
-    
-    function withdraw(uint256 amount) public {
-        require(balances[msg.sender] >= amount, "Insufficient balance");
-        
-        (bool success, ) = msg.sender.call{value: amount}("");
-        
-        balances[msg.sender] -= amount;
-    }
-    
-    function getBalance() public view returns (uint256) {
-        return address(this).balance;
-    }
-}
-`;
 
 function ChallengeDetail() {
   const { id } = useParams();
@@ -84,24 +25,17 @@ function ChallengeDetail() {
   useEffect(() => {
     const fetchChallenge = async () => {
       try {
-        // For demo purposes, we'll use mock data
-        // In a real app, you'd fetch from the API: await axios.get(`${API}/challenges/${id}`);
+        const mockChallenge = getMockChallenge(id);
+        console.log("Mock Challenge:", mockChallenge); // Debug log
         
-        // Mock challenge data
-        const mockChallenge = {
-          id,
-          title: id === "1" ? "Gas Optimization: Token Transfer" : "Fix the Reentrancy Vulnerability",
-          description: id === "1" 
-            ? "Optimize a basic ERC20 transfer function to use minimal gas."
-            : "Identify and fix a reentrancy vulnerability in a mock contract.",
-          challenge_type: id === "1" ? "gas_optimization" : "security_exploit",
-          difficulty: id === "1" ? "beginner" : "intermediate",
-          initial_code: id === "1" ? gasOptimizationTemplate : securityExploitTemplate,
-          reward: id === "1" ? 100 : 200,
-          chain: "avalanche",
-          ends_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() // 24 hours from now
-        };
-        
+        // Ensure we have the initial code
+        if (!mockChallenge.initial_code) {
+          console.error("No initial code found in challenge");
+          setError("Failed to load challenge code.");
+          setLoading(false);
+          return;
+        }
+
         setChallenge(mockChallenge);
         setCode(mockChallenge.initial_code);
         
@@ -120,6 +54,16 @@ function ChallengeDetail() {
 
     fetchChallenge();
   }, [id]);
+
+  // Debug log for code state
+  useEffect(() => {
+    console.log("Current code state:", code);
+  }, [code]);
+
+  // Debug log for challenge state
+  useEffect(() => {
+    console.log("Current challenge state:", challenge);
+  }, [challenge]);
 
   // Countdown timer
   useEffect(() => {
@@ -169,31 +113,12 @@ function ChallengeDetail() {
       
       // For demo purposes, we'll use mock evaluation
       setTimeout(() => {
-        // Mock AI feedback
-        const mockFeedback = challenge.challenge_type === "gas_optimization" 
-          ? {
-              gas_score: 0.78,
-              security_score: 0.65,
-              feedback: "Good optimization of the transfer function. Using unchecked math saves gas. Consider further optimizations for storage variables.",
-              recommendations: [
-                "Consider using uint128 instead of uint256 if the values are small enough",
-                "You can optimize further by using assembly for certain operations",
-                "Add events for better contract monitoring"
-              ]
-            }
-          : {
-              gas_score: 0.45,
-              security_score: 0.85,
-              feedback: "Successfully identified the reentrancy vulnerability. Good job implementing the checks-effects-interactions pattern.",
-              recommendations: [
-                "Consider adding a reentrancy guard modifier for extra protection",
-                "Implement rate limiting to prevent flash loan attacks",
-                "Add more input validation"
-              ]
-            };
+        const mockFeedback = getMockEvaluation(challenge.challenge_type);
         
         setResult({
-          score: challenge.challenge_type === "gas_optimization" ? mockFeedback.gas_score * 100 : mockFeedback.security_score * 100,
+          score: challenge.challenge_type === "gas_optimization" 
+            ? mockFeedback.gas_score * 100 
+            : mockFeedback.security_score * 100,
           feedback: mockFeedback.feedback,
           recommendations: mockFeedback.recommendations
         });
@@ -210,6 +135,52 @@ function ChallengeDetail() {
   // Reset result to allow submitting again
   const handleReset = () => {
     setResult(null);
+  };
+
+  // Helper function to get challenge type color
+  const getChallengeTypeColor = (type) => {
+    switch (type) {
+      case 'gas_optimization':
+        return 'bg-green-900 text-green-300';
+      case 'security_exploit':
+        return 'bg-red-900 text-red-300';
+      case 'access_control':
+        return 'bg-blue-900 text-blue-300';
+      case 'event_logging':
+        return 'bg-purple-900 text-purple-300';
+      default:
+        return 'bg-gray-700 text-gray-300';
+    }
+  };
+
+  // Helper function to get challenge type label
+  const getChallengeTypeLabel = (type) => {
+    switch (type) {
+      case 'gas_optimization':
+        return 'Gas Optimization';
+      case 'security_exploit':
+        return 'Security Exploit';
+      case 'access_control':
+        return 'Access Control';
+      case 'event_logging':
+        return 'Event Logging';
+      default:
+        return type;
+    }
+  };
+
+  // Helper function to get difficulty color
+  const getDifficultyColor = (difficulty) => {
+    switch (difficulty) {
+      case 'beginner':
+        return 'bg-green-900 text-green-300';
+      case 'intermediate':
+        return 'bg-yellow-900 text-yellow-300';
+      case 'advanced':
+        return 'bg-red-900 text-red-300';
+      default:
+        return 'bg-gray-700 text-gray-300';
+    }
   };
 
   if (loading) {
@@ -242,14 +213,10 @@ function ChallengeDetail() {
           <div>
             <h1 className="text-3xl font-bold mb-2">{challenge?.title}</h1>
             <div className="flex flex-wrap items-center gap-2 mb-2">
-              <span className={
-                challenge?.challenge_type === "gas_optimization" 
-                  ? "bg-green-900 text-green-300 px-3 py-1 rounded-full text-xs"
-                  : "bg-red-900 text-red-300 px-3 py-1 rounded-full text-xs"
-              }>
-                {challenge?.challenge_type === "gas_optimization" ? "Gas Optimization" : "Security Exploit"}
+              <span className={`${getChallengeTypeColor(challenge?.challenge_type)} px-3 py-1 rounded-full text-xs`}>
+                {getChallengeTypeLabel(challenge?.challenge_type)}
               </span>
-              <span className="bg-gray-700 text-gray-300 px-3 py-1 rounded-full text-xs">
+              <span className={`${getDifficultyColor(challenge?.difficulty)} px-3 py-1 rounded-full text-xs`}>
                 {challenge?.difficulty}
               </span>
               <div className="flex items-center text-xs text-gray-400">
@@ -257,7 +224,9 @@ function ChallengeDetail() {
                   src={
                     challenge?.chain === "avalanche" 
                       ? "https://upload.wikimedia.org/wikipedia/en/0/03/Avalanche_logo_without_text.png"
-                      : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTyejSxfv1VRb4-lAhpR2xyG-_-A1XH0n9riw&s"
+                      : challenge?.chain === "ethereum"
+                        ? "https://upload.wikimedia.org/wikipedia/commons/0/05/Ethereum_logo_2014.svg"
+                        : "https://polygon.technology/_nuxt/img/polygon-logo.8a3c4c9.svg"
                   } 
                   alt={challenge?.chain} 
                   className="w-4 h-4 mr-1"
@@ -276,7 +245,7 @@ function ChallengeDetail() {
             
             <div className="bg-gray-800 px-4 py-2 rounded-lg">
               <div className="text-sm text-gray-400 mb-1">Reward:</div>
-              <div className="text-xl font-medium text-yellow-500">{challenge?.reward} AVAX</div>
+              <div className="text-xl font-medium text-yellow-500">{challenge?.reward} {challenge?.chain === "ethereum" ? "ETH" : challenge?.chain === "polygon" ? "MATIC" : "AVAX"}</div>
             </div>
           </div>
         </div>
@@ -289,67 +258,80 @@ function ChallengeDetail() {
         </div>
       )}
       
-      {/* Code Editor */}
+      {/* Initial Smart Contract Code */}
+      <div className="bg-gray-800 rounded-lg overflow-hidden mb-6">
+        <div className="border-b border-gray-700 px-4 py-2 flex justify-between items-center">
+          <h3 className="font-medium">Initial Smart Contract Code</h3>
+          <span className="text-sm text-gray-400">Read-only</span>
+        </div>
+        <div className="h-[300px]">
+          {challenge?.initial_code ? (
+            <Editor
+              height="100%"
+              language="sol"
+              theme="vs-dark"
+              value={challenge.initial_code}
+              options={{
+                minimap: { enabled: false },
+                scrollBeyondLastLine: false,
+                fontSize: 14,
+                tabSize: 2,
+                readOnly: true,
+                lineNumbers: "on",
+                folding: true,
+                wordWrap: "on"
+              }}
+            />
+          ) : (
+            <div className="flex items-center justify-center h-full text-gray-400">
+              Loading initial code...
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Solution Editor */}
       <div className="bg-gray-800 rounded-lg overflow-hidden mb-6">
         <div className="border-b border-gray-700 px-4 py-2">
-          <h3 className="font-medium">Smart Contract Editor</h3>
+          <h3 className="font-medium">Your Solution</h3>
         </div>
         <div className="h-[500px]">
-          <Editor
-            height="100%"
-            language="sol"
-            theme="vs-dark"
-            value={code}
-            onChange={setCode}
-            options={{
-              minimap: { enabled: false },
-              scrollBeyondLastLine: false,
-              fontSize: 14,
-              tabSize: 2
-            }}
-          />
+          {code ? (
+            <Editor
+              height="100%"
+              language="sol"
+              theme="vs-dark"
+              value={code}
+              onChange={(value) => {
+                console.log("Editor onChange:", value); // Debug log
+                setCode(value || "");
+              }}
+              options={{
+                minimap: { enabled: false },
+                scrollBeyondLastLine: false,
+                fontSize: 14,
+                tabSize: 2,
+                lineNumbers: "on",
+                folding: true,
+                wordWrap: "on"
+              }}
+            />
+          ) : (
+            <div className="flex items-center justify-center h-full text-gray-400">
+              Loading editor...
+            </div>
+          )}
         </div>
       </div>
       
       {/* AI Evaluation Result */}
       {result && (
-        <div className="bg-gray-800 rounded-lg overflow-hidden mb-6 p-6">
-          <h3 className="text-xl font-semibold mb-4">AI Evaluation Results</h3>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            <div>
-              <h4 className="text-lg font-medium mb-2">Score</h4>
-              <div className="flex items-center">
-                <div className="relative w-full h-4 bg-gray-700 rounded-full overflow-hidden">
-                  <div 
-                    className={
-                      result.score >= 80 
-                        ? "absolute top-0 left-0 h-full bg-green-500"
-                        : result.score >= 60
-                          ? "absolute top-0 left-0 h-full bg-yellow-500"
-                          : "absolute top-0 left-0 h-full bg-red-500"
-                    }
-                    style={{ width: `${result.score}%` }}
-                  ></div>
-                </div>
-                <span className="ml-4 font-mono text-xl">{result.score.toFixed(1)}%</span>
-              </div>
-            </div>
-            
-            <div>
-              <h4 className="text-lg font-medium mb-2">Feedback</h4>
-              <p className="text-gray-300">{result.feedback}</p>
-            </div>
-          </div>
-          
-          <div>
-            <h4 className="text-lg font-medium mb-2">Recommendations</h4>
-            <ul className="list-disc list-inside text-gray-300 space-y-1">
-              {result.recommendations.map((rec, index) => (
-                <li key={index}>{rec}</li>
-              ))}
-            </ul>
-          </div>
+        <div className="mb-6">
+          <AICompanion
+            feedback={result.feedback}
+            recommendations={result.recommendations}
+            score={result.score}
+          />
         </div>
       )}
       

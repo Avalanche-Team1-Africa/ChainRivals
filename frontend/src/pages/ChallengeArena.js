@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function ChallengeArena({ challenges = [] }) {
+  const navigate = useNavigate();
   const [filters, setFilters] = useState({
     type: "all",
     difficulty: "all",
@@ -61,11 +62,22 @@ function ChallengeArena({ challenges = [] }) {
 
   return (
     <div>
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold mb-4">Challenge Arena</h1>
-        <p className="text-gray-400">
-          Browse and participate in smart contract challenges across multiple blockchains.
-        </p>
+      <div className="mb-8 flex justify-between items-center">
+        <div>
+          <h1 className="text-4xl font-bold mb-4">Challenge Arena</h1>
+          <p className="text-gray-400">
+            Browse and participate in smart contract challenges across multiple blockchains.
+          </p>
+        </div>
+        <button
+          onClick={() => navigate('/submit-contract')}
+          className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-medium transition flex items-center space-x-2"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+          </svg>
+          <span>Create your own challenge</span>
+        </button>
       </div>
 
       {/* Filters */}

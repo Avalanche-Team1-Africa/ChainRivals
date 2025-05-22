@@ -14,6 +14,7 @@ import ChallengeDetail from "./pages/ChallengeDetail";
 import Leaderboard from "./pages/Leaderboard";
 import Profile from "./pages/Profile";
 import AIHelper from "./components/ai-helper/AIHelper";
+import SubmitContract from "./pages/SubmitContract.js";
 
 // MetaMask Context
 import { MetaMaskContextProvider } from "./contexts/MetaMaskContext";
@@ -113,6 +114,7 @@ function App() {
               <Route path="/challenges/:id" element={<ChallengeDetail />} />
               <Route path="/leaderboard" element={<Leaderboard />} />
               <Route path="/profile/:address" element={<Profile />} />
+              <Route path="/submit-contract" element={<SubmitContract />} />
             </Routes>
           </main>
           <Footer />

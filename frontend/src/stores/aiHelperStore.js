@@ -58,12 +58,17 @@ export const useAIHelperStore = create((set) => ({
     content
   }),
 
-  createFormWidget: (title, fields, onSubmit) => ({
+  createFormWidget: ({ title, fields, onSubmit }) => ({
     id: `form_${Date.now()}`,
     type: 'form',
     title,
     fields,
-    onSubmit
+    onSubmit,
+    state: {
+      values: {},
+      errors: {},
+      isSubmitting: false
+    }
   }),
 
   createChartWidget: (title, data) => ({
@@ -82,12 +87,12 @@ export const useAIHelperStore = create((set) => ({
     language
   }),
 
-  createProgressWidget: (title, progress, status) => ({
+  createProgressWidget: (title, status, progress) => ({
     id: `progress_${Date.now()}`,
     type: 'progress',
     title,
-    progress,
-    status
+    status,
+    progress
   }),
 
   createAlertWidget: (title, message, type = 'info') => ({

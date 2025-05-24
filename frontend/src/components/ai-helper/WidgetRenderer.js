@@ -2,6 +2,32 @@ import { motion } from 'framer-motion';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import Editor from '@monaco-editor/react';
 import { useAIHelperStore } from '../../stores/aiHelperStore';
+import { useState } from 'react';
+
+const StarRating = ({ value, onChange }) => {
+  return (
+    <div className="flex space-x-1">
+      {[1, 2, 3, 4, 5].map((star) => (
+        <button
+          key={star}
+          onClick={() => onChange(star)}
+          className="focus:outline-none"
+          type="button"
+        >
+          <svg
+            className={`w-8 h-8 ${
+              star <= value ? 'text-yellow-400' : 'text-gray-400'
+            }`}
+            fill="currentColor"
+            viewBox="0 0 20 20"
+          >
+            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+          </svg>
+        </button>
+      ))}
+    </div>
+  );
+};
 
 const WidgetRenderer = ({ widget }) => {
   const { 
@@ -9,8 +35,17 @@ const WidgetRenderer = ({ widget }) => {
     currentMessage, 
     setCurrentMessage, 
     addChatMessage,
-    isLoading 
+    isLoading,
+    updateWidget,
+    addWidget,
+    createButtonWidget,
+    createFormWidget,
+    createAlertWidget
   } = useAIHelperStore();
+
+  const [formData, setFormData] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSendMessage = (e) => {
     e.preventDefault();
@@ -21,8 +56,8 @@ const WidgetRenderer = ({ widget }) => {
         sender: 'user',
         timestamp: new Date().toISOString()
       });
-      // Here you would typically make an API call to get the AI response
-      // For now, we'll simulate a response
+
+      // Simulate AI response
       setTimeout(() => {
         addChatMessage({
           id: Date.now() + 1,
@@ -30,7 +65,80 @@ const WidgetRenderer = ({ widget }) => {
           sender: 'ai',
           timestamp: new Date().toISOString()
         });
+
+        // Add feedback button after AI response
+        addWidget(createButtonWidget('Give Feedback', () => {
+          addWidget(createFormWidget({
+            title: 'We\'d Love Your Feedback',
+            fields: [
+              {
+                type: 'rating',
+                label: 'How would you rate your experience?',
+                required: true
+              },
+              {
+                type: 'textarea',
+                label: 'Your Feedback',
+                placeholder: 'Tell us what you think...',
+                required: true
+              },
+              {
+                type: 'email',
+                label: 'Email (optional)',
+                placeholder: 'your@email.com'
+              }
+            ],
+            onSubmit: async (formData) => {
+              try {
+                setLoading(true);
+                // TODO: Implement actual submission logic
+                await new Promise(resolve => setTimeout(resolve, 1000)); // Simulated API call
+                addWidget(createAlertWidget(
+                  'Thank You!',
+                  'Your feedback has been submitted successfully.',
+                  'success'
+                ));
+              } catch (err) {
+                setError('Failed to submit feedback. Please try again.');
+                addWidget(createAlertWidget(
+                  'Submission Failed',
+                  err.message || 'An unexpected error occurred',
+                  'error'
+                ));
+              } finally {
+                setLoading(false);
+              }
+            }
+          }));
+        }));
       }, 1000);
+    }
+  };
+
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+    const widgetId = widget.id;
+    
+    // Update widget state to show loading
+    updateWidget(widgetId, {
+      state: {
+        ...widget.state,
+        isSubmitting: true
+      }
+    });
+
+    try {
+      await widget.onSubmit(formData);
+    } catch (error) {
+      console.error('Form submission error:', error);
+    } finally {
+      // Update widget state to hide loading
+      updateWidget(widgetId, {
+        state: {
+          ...widget.state,
+          isSubmitting: false
+        }
+      });
     }
   };
 
@@ -140,44 +248,58 @@ const WidgetRenderer = ({ widget }) => {
 
       case 'form':
         return (
-          <div className="bg-gray-800 rounded-lg p-4 border border-gray-700 space-y-4">
+          <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
             <h3 className="text-lg font-semibold text-white mb-4">{widget.title}</h3>
-            {widget.fields.map((field, index) => (
-              <div key={index} className="space-y-2">
-                <label className="block text-sm font-medium text-gray-300">
-                  {field.label}
-                </label>
-                {field.type === 'text' && (
-                  <input
-                    type="text"
-                    value={field.value}
-                    onChange={(e) => field.onChange(e.target.value)}
-                    className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  />
-                )}
-                {field.type === 'select' && (
-                  <select
-                    value={field.value}
-                    onChange={(e) => field.onChange(e.target.value)}
-                    className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  >
-                    {field.options.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                )}
-              </div>
-            ))}
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={widget.onSubmit}
-              className="w-full px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors mt-4"
-            >
-              {widget.submitLabel || 'Submit'}
-            </motion.button>
+            <form onSubmit={handleFormSubmit} className="space-y-4">
+              {widget.fields.map((field, index) => (
+                <div key={index} className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-300">
+                    {field.label}
+                    {field.required && <span className="text-red-500 ml-1">*</span>}
+                  </label>
+                  
+                  {field.type === 'rating' && (
+                    <StarRating
+                      value={formData[field.label] || 0}
+                      onChange={(value) => setFormData({ ...formData, [field.label]: value })}
+                    />
+                  )}
+                  
+                  {field.type === 'textarea' && (
+                    <textarea
+                      value={formData[field.label] || ''}
+                      onChange={(e) => setFormData({ ...formData, [field.label]: e.target.value })}
+                      placeholder={field.placeholder}
+                      required={field.required}
+                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      rows="4"
+                    />
+                  )}
+                  
+                  {field.type === 'email' && (
+                    <input
+                      type="email"
+                      value={formData[field.label] || ''}
+                      onChange={(e) => setFormData({ ...formData, [field.label]: e.target.value })}
+                      placeholder={field.placeholder}
+                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    />
+                  )}
+                </div>
+              ))}
+              
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                type="submit"
+                disabled={widget.state?.isSubmitting}
+                className={`w-full px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors ${
+                  widget.state?.isSubmitting ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
+              >
+                {widget.state?.isSubmitting ? 'Submitting...' : 'Submit Feedback'}
+              </motion.button>
+            </form>
           </div>
         );
 
@@ -249,39 +371,42 @@ const WidgetRenderer = ({ widget }) => {
         );
 
       case 'alert':
-        const alertColors = {
-          info: 'bg-blue-900/50 border-blue-700 text-blue-300',
-          success: 'bg-green-900/50 border-green-700 text-green-300',
-          warning: 'bg-yellow-900/50 border-yellow-700 text-yellow-300',
-          error: 'bg-red-900/50 border-red-700 text-red-300'
-        };
-
         return (
-          <div className={`rounded-lg p-4 border ${alertColors[widget.alertType]}`}>
-            <h3 className="font-semibold mb-2">{widget.title}</h3>
-            <p>{widget.message}</p>
-          </div>
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className={`rounded-lg p-4 ${
+              widget.alertType === 'error'
+                ? 'bg-red-900/50 border border-red-700'
+                : widget.alertType === 'success'
+                ? 'bg-green-900/50 border border-green-700'
+                : widget.alertType === 'warning'
+                ? 'bg-yellow-900/50 border border-yellow-700'
+                : 'bg-blue-900/50 border border-blue-700'
+            }`}
+          >
+            <h3 className="text-lg font-semibold text-white mb-2">{widget.title}</h3>
+            <p className="text-gray-300">{widget.message}</p>
+          </motion.div>
         );
 
       case 'list':
-        const ListComponent = widget.listType === 'ordered' ? 'ol' : 'ul';
-        const listStyle = widget.listType === 'ordered' ? 'list-decimal' : 'list-disc';
-
         return (
           <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
             <h3 className="text-lg font-semibold text-white mb-4">{widget.title}</h3>
-            <ListComponent className={`${listStyle} list-inside space-y-2 text-gray-300`}>
-              {widget.items.map((item, index) => (
-                <motion.li
-                  key={index}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                >
-                  {item}
-                </motion.li>
-              ))}
-            </ListComponent>
+            {widget.listType === 'ordered' ? (
+              <ol className="list-decimal list-inside space-y-2 text-gray-300">
+                {widget.items.map((item, index) => (
+                  <li key={index}>{item}</li>
+                ))}
+              </ol>
+            ) : (
+              <ul className="list-disc list-inside space-y-2 text-gray-300">
+                {widget.items.map((item, index) => (
+                  <li key={index}>{item}</li>
+                ))}
+              </ul>
+            )}
           </div>
         );
 
@@ -290,16 +415,7 @@ const WidgetRenderer = ({ widget }) => {
     }
   };
 
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      className="w-full"
-    >
-      {renderWidget()}
-    </motion.div>
-  );
+  return renderWidget();
 };
 
 export default WidgetRenderer; 

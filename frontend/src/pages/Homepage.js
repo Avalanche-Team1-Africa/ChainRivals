@@ -1,9 +1,9 @@
 import { Link } from "react-router-dom";
 import { useContext } from "react";
-import { MetaMaskContext } from "../contexts/MetaMaskContext";
+import { WalletContext } from "../contexts/MetaMaskContext";
 
 function Homepage({ challenges }) {
-  const { wallet } = useContext(MetaMaskContext);
+  const { wallet } = useContext(WalletContext);
 
   return (
     <div className="space-y-16">

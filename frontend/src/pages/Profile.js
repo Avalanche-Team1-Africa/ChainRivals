@@ -1,14 +1,14 @@
 import { useState, useEffect, useContext } from "react";
 import { useParams, Link } from "react-router-dom";
 import axios from "axios";
-import { MetaMaskContext } from "../contexts/MetaMaskContext";
+import { WalletContext } from "../contexts/MetaMaskContext";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
 function Profile() {
   const { address } = useParams();
-  const { wallet } = useContext(MetaMaskContext);
+  const { wallet } = useContext(WalletContext);
   const [profile, setProfile] = useState(null);
   const [submissions, setSubmissions] = useState([]);
   const [loading, setLoading] = useState(true);

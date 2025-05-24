@@ -2,7 +2,7 @@ import { useState, useEffect, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Editor from "@monaco-editor/react";
-import { MetaMaskContext } from "../contexts/MetaMaskContext";
+import { WalletContext } from "../contexts/MetaMaskContext";
 import { getMockChallenge, getMockEvaluation } from "../data/challengeTemplates";
 import AICompanion from "../components/AICompanion";
 
@@ -12,7 +12,7 @@ const API = `${BACKEND_URL}/api`;
 function ChallengeDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { wallet } = useContext(MetaMaskContext);
+  const { wallet } = useContext(WalletContext);
   const [challenge, setChallenge] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);

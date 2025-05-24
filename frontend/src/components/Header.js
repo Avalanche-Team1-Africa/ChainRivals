@@ -109,6 +109,9 @@ function Header() {
           <Link to="/leaderboard" className="text-gray-300 hover:text-white transition">
             Leaderboard
           </Link>
+          <Link to="/vulnerability-guide" className="text-gray-300 hover:text-white transition">
+            Security Guide
+          </Link>
           <Link to="/faq" className="text-gray-300 hover:text-white transition">
             FAQ
           </Link>

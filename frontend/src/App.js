@@ -16,6 +16,7 @@ import Leaderboard from "./pages/Leaderboard";
 import Profile from "./pages/Profile";
 import AIHelper from "./components/ai-helper/AIHelper";
 import SubmitContract from "./pages/SubmitContract.js";
+import VulnerabilityGuide from "./pages/VulnerabilityGuide";
 
 // User Experience Components
 import {
@@ -82,6 +83,7 @@ function App() {
               <Route path="/profile/:address" element={<Profile />} />
               <Route path="/submit-contract" element={<SubmitContract />} />
               <Route path="/faq" element={<FAQ />} />
+              <Route path="/vulnerability-guide" element={<VulnerabilityGuide />} />
             </Routes>
           </main>
           <ConditionalEmailSignup />

@@ -50,13 +50,13 @@ function ChallengeArena({ challenges = [] }) {
       case "ethereum":
         return "https://upload.wikimedia.org/wikipedia/commons/0/05/Ethereum_logo_2014.svg";
       case "polygon":
-        return "https://polygon.technology/_nuxt/img/polygon-logo.8a3c4c9.svg";
+        return "https://assets.coingecko.com/coins/images/4713/standard/polygon.png";
       case "celo":
-        return "https://cryptologos.cc/logos/celo-celo-logo.svg";
+        return "https://assets.coingecko.com/coins/images/11090/standard/InjXBNx9_400x400.jpg";
       case "lisk":
-        return "https://cryptologos.cc/logos/lisk-lsk-logo.svg";
+        return "https://assets.coingecko.com/coins/images/385/standard/Lisk_logo.png";
       default:
-        return "https://upload.wikimedia.org/wikipedia/en/0/03/Avalanche_logo_without_text.png";
+        return "https://i.pinimg.com/564x/a1/85/fb/a185fb1e19ce1225d619ba36a0f85b29.jpg";
     }
   };
 

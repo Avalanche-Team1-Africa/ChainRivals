@@ -4,6 +4,7 @@ import { ethers } from "ethers";
 import axios from "axios";
 import "./App.css";
 import { getMockChallenge } from './data/challengeTemplates';
+import { apiService } from './services/api';
 
 // Components
 import Header from "./components/Header";
@@ -55,70 +56,11 @@ function App() {
   useEffect(() => {
     const fetchChallenges = async () => {
       try {
-        // Try to fetch from API first
-        const response = await axios.get(`${API}/challenges`);
-        setDisplayChallenges(response.data);
+        const challenges = await apiService.getChallenges();
+        setDisplayChallenges(challenges);
       } catch (error) {
-        console.log("Using mock challenges due to API error:", error);
-        // If API fails, use mock challenges
-        const mockChallenges = [
-          // Avalanche Challenges
-          {
-            ...getMockChallenge("1"),
-            chain: "avalanche",
-            reward: 100
-          },
-          {
-            ...getMockChallenge("2"),
-            chain: "avalanche",
-            reward: 150
-          },
-          // Ethereum Challenges
-          {
-            ...getMockChallenge("3"),
-            chain: "ethereum",
-            reward: 0.5
-          },
-          {
-            ...getMockChallenge("4"),
-            chain: "ethereum",
-            reward: 0.75
-          },
-          // Polygon Challenges
-          {
-            ...getMockChallenge("5"),
-            chain: "polygon",
-            reward: 50
-          },
-          {
-            ...getMockChallenge("6"),
-            chain: "polygon",
-            reward: 75
-          },
-          // Celo Challenges
-          {
-            ...getMockChallenge("7"),
-            chain: "celo",
-            reward: 200
-          },
-          {
-            ...getMockChallenge("8"),
-            chain: "celo",
-            reward: 250
-          },
-          // Lisk Challenges
-          {
-            ...getMockChallenge("9"),
-            chain: "lisk",
-            reward: 300
-          },
-          {
-            ...getMockChallenge("10"),
-            chain: "lisk",
-            reward: 350
-          }
-        ];
-        setDisplayChallenges(mockChallenges);
+        console.error("Error fetching challenges:", error);
+        setDisplayChallenges([]);
       }
     };
 

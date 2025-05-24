@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import config from '../config';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -122,6 +123,15 @@ function Leaderboard() {
   // Handle filter change
   const handleFilterChange = (value) => {
     setFilter(value);
+  };
+
+  // Helper function to get chain info
+  const getChainInfo = (chainId) => {
+    return config.supportedChains[chainId] || {
+      name: chainId,
+      symbol: chainId.toUpperCase(),
+      logo: ''
+    };
   };
 
   if (loading) {
@@ -278,16 +288,8 @@ function Leaderboard() {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <img 
-                        src={
-                          user.chain === "avalanche" 
-                            ? "https://upload.wikimedia.org/wikipedia/en/0/03/Avalanche_logo_without_text.png"
-                            : user.chain === "celo"
-                              ? "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTyejSxfv1VRb4-lAhpR2xyG-_-A1XH0n9riw&s"
-                              : user.chain === "polygon"
-                                ? "https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/Polygon_Icon.svg/800px-Polygon_Icon.svg.png"
-                                : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTnzyhzN1YSR8HlnU962hUG0BJv4FaSm9NljA&s"
-                        } 
-                        alt={user.chain} 
+                        src={getChainInfo(user.chain).logo}
+                        alt={getChainInfo(user.chain).name}
                         className="w-4 h-4 mr-1"
                       />
                       <span className="capitalize">{user.chain}</span>

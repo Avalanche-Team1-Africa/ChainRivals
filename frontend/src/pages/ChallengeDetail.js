@@ -1,13 +1,10 @@
 import { useState, useEffect, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
 import Editor from "@monaco-editor/react";
 import { WalletContext } from "../contexts/MetaMaskContext";
-import { getMockChallenge, getMockEvaluation } from "../data/challengeTemplates";
+import { apiService } from '../services/api';
+import config from '../config';
 import AICompanion from "../components/AICompanion";
-
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
 
 function ChallengeDetail() {
   const { id } = useParams();
@@ -25,22 +22,21 @@ function ChallengeDetail() {
   useEffect(() => {
     const fetchChallenge = async () => {
       try {
-        const mockChallenge = getMockChallenge(id);
-        console.log("Mock Challenge:", mockChallenge); // Debug log
+        const challengeData = await apiService.getChallenge(id);
         
         // Ensure we have the initial code
-        if (!mockChallenge.initial_code) {
+        if (!challengeData.initial_code) {
           console.error("No initial code found in challenge");
           setError("Failed to load challenge code.");
           setLoading(false);
           return;
         }
 
-        setChallenge(mockChallenge);
-        setCode(mockChallenge.initial_code);
+        setChallenge(challengeData);
+        setCode(challengeData.initial_code);
         
         // Calculate time left
-        const endTime = new Date(mockChallenge.ends_at).getTime();
+        const endTime = new Date(challengeData.ends_at).getTime();
         const now = Date.now();
         setTimeLeft(Math.max(0, Math.floor((endTime - now) / 1000)));
         
@@ -54,16 +50,6 @@ function ChallengeDetail() {
 
     fetchChallenge();
   }, [id]);
-
-  // Debug log for code state
-  useEffect(() => {
-    console.log("Current code state:", code);
-  }, [code]);
-
-  // Debug log for challenge state
-  useEffect(() => {
-    console.log("Current challenge state:", challenge);
-  }, [challenge]);
 
   // Countdown timer
   useEffect(() => {
@@ -104,27 +90,14 @@ function ChallengeDetail() {
     setError(null);
     
     try {
-      // In a real app, this would call the backend API
-      // const response = await axios.post(`${API}/submissions`, {
-      //   challenge_id: challenge.id,
-      //   user_id: wallet.address,
-      //   code
-      // });
+      const submissionResult = await apiService.submitSolution(
+        challenge.id,
+        wallet.address,
+        code
+      );
       
-      // For demo purposes, we'll use mock evaluation
-      setTimeout(() => {
-        const mockFeedback = getMockEvaluation(challenge.challenge_type);
-        
-        setResult({
-          score: challenge.challenge_type === "gas_optimization" 
-            ? mockFeedback.gas_score * 100 
-            : mockFeedback.security_score * 100,
-          feedback: mockFeedback.feedback,
-          recommendations: mockFeedback.recommendations
-        });
-        setSubmitting(false);
-      }, 2000);
-      
+      setResult(submissionResult);
+      setSubmitting(false);
     } catch (err) {
       console.error("Error submitting solution:", err);
       setError("Failed to submit your solution. Please try again.");
@@ -183,6 +156,15 @@ function ChallengeDetail() {
     }
   };
 
+  // Helper function to get chain info
+  const getChainInfo = (chainId) => {
+    return config.supportedChains[chainId] || {
+      name: chainId,
+      symbol: chainId.toUpperCase(),
+      logo: ''
+    };
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -220,18 +202,16 @@ function ChallengeDetail() {
                 {challenge?.difficulty}
               </span>
               <div className="flex items-center text-xs text-gray-400">
-                <img 
-                  src={
-                    challenge?.chain === "avalanche" 
-                      ? "https://upload.wikimedia.org/wikipedia/en/0/03/Avalanche_logo_without_text.png"
-                      : challenge?.chain === "ethereum"
-                        ? "https://upload.wikimedia.org/wikipedia/commons/0/05/Ethereum_logo_2014.svg"
-                        : "https://polygon.technology/_nuxt/img/polygon-logo.8a3c4c9.svg"
-                  } 
-                  alt={challenge?.chain} 
-                  className="w-4 h-4 mr-1"
-                />
-                {challenge?.chain}
+                {challenge?.chain && (
+                  <>
+                    <img 
+                      src={getChainInfo(challenge.chain).logo}
+                      alt={getChainInfo(challenge.chain).name}
+                      className="w-4 h-4 mr-1"
+                    />
+                    {getChainInfo(challenge.chain).name}
+                  </>
+                )}
               </div>
             </div>
             <p className="text-gray-400">{challenge?.description}</p>
@@ -245,7 +225,9 @@ function ChallengeDetail() {
             
             <div className="bg-gray-800 px-4 py-2 rounded-lg">
               <div className="text-sm text-gray-400 mb-1">Reward:</div>
-              <div className="text-xl font-medium text-yellow-500">{challenge?.reward} {challenge?.chain === "ethereum" ? "ETH" : challenge?.chain === "polygon" ? "MATIC" : "AVAX"}</div>
+              <div className="text-xl font-medium text-yellow-500">
+                {challenge?.reward} {challenge?.chain && getChainInfo(challenge.chain).symbol}
+              </div>
             </div>
           </div>
         </div>
@@ -302,10 +284,7 @@ function ChallengeDetail() {
               language="sol"
               theme="vs-dark"
               value={code}
-              onChange={(value) => {
-                console.log("Editor onChange:", value); // Debug log
-                setCode(value || "");
-              }}
+              onChange={(value) => setCode(value || "")}
               options={{
                 minimap: { enabled: false },
                 scrollBeyondLastLine: false,

@@ -1,10 +1,7 @@
 import { useState, useEffect, useContext } from "react";
 import { useParams, Link } from "react-router-dom";
-import axios from "axios";
 import { WalletContext } from "../contexts/MetaMaskContext";
-
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
+import { apiService } from '../services/api';
 
 function Profile() {
   const { address } = useParams();
@@ -21,65 +18,12 @@ function Profile() {
     // Fetch profile data
     const fetchProfile = async () => {
       try {
-        // In a real app, these would be API calls
-        // const profileResponse = await axios.get(`${API}/users/${address}`);
-        // const submissionsResponse = await axios.get(`${API}/submissions/user/${profileResponse.data.id}`);
+        const profileData = await apiService.getUserProfile(address);
+        setProfile(profileData);
         
-        // Mock profile data
-        const mockProfile = {
-          id: "user_" + address.substring(0, 8),
-          wallet_address: address,
-          username: isOwnProfile ? "YourUsername" : "GasWizard",
-          reputation_score: isOwnProfile ? 845 : 728,
-          created_at: "2024-01-15T00:00:00Z"
-        };
+        const submissionsData = await apiService.getUserSubmissions(profileData.id);
+        setSubmissions(submissionsData);
         
-        // Mock submissions data
-        const mockSubmissions = [
-          {
-            id: "sub1",
-            challenge_id: "1",
-            challenge_title: "Gas Optimization: Token Transfer",
-            score: 87.5,
-            feedback: "Excellent optimization of the transfer function.",
-            created_at: "2024-03-10T14:25:00Z",
-            challenge_type: "gas_optimization",
-            is_winner: true
-          },
-          {
-            id: "sub2",
-            challenge_id: "2",
-            challenge_title: "Fix the Reentrancy Vulnerability",
-            score: 92.0,
-            feedback: "Successfully identified and fixed the reentrancy issue.",
-            created_at: "2024-03-05T16:42:00Z",
-            challenge_type: "security_exploit",
-            is_winner: true
-          },
-          {
-            id: "sub3",
-            challenge_id: "3",
-            challenge_title: "Optimize NFT Minting Function",
-            score: 78.5,
-            feedback: "Good attempt, but missing some key optimizations.",
-            created_at: "2024-02-25T10:15:00Z",
-            challenge_type: "gas_optimization",
-            is_winner: false
-          },
-          {
-            id: "sub4",
-            challenge_id: "4",
-            challenge_title: "Secure Multi-Signature Wallet",
-            score: 68.0,
-            feedback: "Basic implementation, but lacks some security considerations.",
-            created_at: "2024-02-18T11:30:00Z",
-            challenge_type: "security_exploit",
-            is_winner: false
-          }
-        ];
-        
-        setProfile(mockProfile);
-        setSubmissions(mockSubmissions);
         setLoading(false);
       } catch (err) {
         console.error("Error fetching profile:", err);
